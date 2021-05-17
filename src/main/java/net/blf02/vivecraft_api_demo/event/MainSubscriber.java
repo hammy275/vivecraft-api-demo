@@ -1,9 +1,10 @@
 package net.blf02.vivecraft_api_demo.event;
 
 import net.blf02.vivecraft_api_demo.init.ItemInit;
+import net.blf02.vivecraft_api_demo.item.Wand;
 import net.blf02.vivecraft_api_demo.network.PacketHandler;
 import net.blf02.vivecraft_api_demo.network.packet.PlayerAction;
-import net.blf02.vivecraft_api_demo.util.PlayerTracker;
+import net.blf02.vivecraft_api_demo.util.PlayerHandler;
 import net.blf02.vivecraftapi.api.events.VRPlayerTickEvent;
 import net.blf02.vivecraftapi.dataclass.VRObjectInfo;
 import net.minecraft.block.Blocks;
@@ -35,12 +36,12 @@ public class MainSubscriber {
 
         // Immersive furnace code
         if (event.player.world.getBlockState(pos).getBlock() == Blocks.FURNACE &&
-                !PlayerTracker.handInFurnacePlayers.contains(event.player)) {
+                !PlayerHandler.handInFurnacePlayers.contains(event.player)) {
             // Get tile entity for furnace
             FurnaceTileEntity tileEnt = (FurnaceTileEntity) event.player.world.getTileEntity(pos);
             /* Mark player as currently using furnace (prevents a player from using the furnace multiple times
                without taking their hand out first) */
-            PlayerTracker.handInFurnacePlayers.add(event.player);
+            PlayerHandler.handInFurnacePlayers.add(event.player);
 
             if (event.player.getHeldItemMainhand() == ItemStack.EMPTY) {
                 /* If the player's hand is empty, and there is something in the output slot, we can
@@ -62,8 +63,11 @@ public class MainSubscriber {
             }
         } else if (event.player.world.getBlockState(pos).getBlock() != Blocks.FURNACE) {
             // Mark player as not using furnace if their hand isn't in a furnace anymore
-            PlayerTracker.handInFurnacePlayers.remove(event.player);
+            PlayerHandler.handInFurnacePlayers.remove(event.player);
         }
+
+        // Ticks for magic wand. See the item.Wand class for more info on what this is doing.
+        Wand.vrPlayerTick(event.player);
     }
 
 }

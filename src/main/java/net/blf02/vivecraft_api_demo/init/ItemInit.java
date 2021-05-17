@@ -2,6 +2,7 @@ package net.blf02.vivecraft_api_demo.init;
 
 import net.blf02.vivecraft_api_demo.VivecraftAPIDemo;
 import net.blf02.vivecraft_api_demo.item.LaserHands;
+import net.blf02.vivecraft_api_demo.item.Wand;
 import net.blf02.vivecraft_api_demo.material.ModArmorMaterial;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorItem;
@@ -24,5 +25,8 @@ public class ItemInit {
             0, 0, null);
     public static final RegistryObject<Item> laserHelmet = ITEMS.register("laser_helmet", () ->
             new ArmorItem(laserHelmMaterial, EquipmentSlotType.HEAD, new Item.Properties().group(ItemGroup.COMBAT)));
+
+    public static final RegistryObject<Item> wand = ITEMS.register("wand", () ->
+            new Wand(new Item.Properties().group(ItemGroup.MISC)));
 
 }

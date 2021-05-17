@@ -2,6 +2,7 @@ package net.blf02.vivecraft_api_demo;
 
 import net.blf02.vivecraft_api_demo.event.MainSubscriber;
 import net.blf02.vivecraft_api_demo.init.ItemInit;
+import net.blf02.vivecraft_api_demo.item.Wand;
 import net.blf02.vivecraft_api_demo.network.PacketHandler;
 import net.blf02.vivecraft_api_demo.network.packet.PlayerAction;
 import net.blf02.vivecraftapi.api.events.VRPlayerTickEvent;
@@ -47,5 +48,8 @@ public class VivecraftAPIDemo {
 
         int index = 1;
         main.registerMessage(index++, PlayerAction.class, PlayerAction::encode, PlayerAction::decode, PlayerAction::handle);
+
+        // Registers wand spells.
+        Wand.registerSpells();
     }
 }
