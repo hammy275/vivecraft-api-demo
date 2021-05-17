@@ -23,9 +23,7 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Wand extends Item {
 
@@ -49,7 +47,7 @@ public class Wand extends Item {
                 // Attempt to get a position for the spell, failing if we don't get one.
                 BlockPos spellPos = getSpellPosition(worldIn, playerIn, data.getActiveController().getPos(),
                         data.getActiveController().asLookVec());
-                if (spellPos == null) {
+                if (spellPos == null && getActiveSpell(playerIn).needsPosition()) {
                     clearWandInfo(playerIn);
                     playerIn.world.playSound(null, playerIn.getPosition(), SoundEvents.BLOCK_NOTE_BLOCK_BASS,
                             SoundCategory.PLAYERS, 1, 0.5f);
@@ -57,7 +55,7 @@ public class Wand extends Item {
                 }
 
                 // Cast the spell, and reset the player for another spell.
-                doSpell(getActiveSpell(playerIn), spellPos, worldIn);
+                doSpell(getActiveSpell(playerIn), spellPos, worldIn, playerIn);
                 clearWandInfo(playerIn);
                 return ActionResult.resultSuccess(playerIn.getHeldItemMainhand());
             }
@@ -200,6 +198,14 @@ public class Wand extends Item {
         lightning.add(Direction.DOWN);
         lightning.add(Direction.SIDE);
         spellList.put(lightning, ActiveSpell.LIGHTNING);
+
+        ArrayList<Direction> heal = new ArrayList<>(Arrays.asList(Direction.SIDE, Direction.SIDE,
+                Direction.SIDE, Direction.SIDE));
+        spellList.put(heal, ActiveSpell.HEAL);
+
+        ArrayList<Direction> leap = new ArrayList<>(Arrays.asList(Direction.UP, Direction.UP,
+                Direction.UP, Direction.UP));
+        spellList.put(leap, ActiveSpell.LEAP);
     }
 
     /**
@@ -268,12 +274,21 @@ public class Wand extends Item {
      * @param spell The spell to perform.
      * @param pos The location to perform the spell.
      * @param world The world to perform the spell in.
+     * @param player The player that is performing the spell.
      */
-    public static void doSpell(ActiveSpell spell, BlockPos pos, World world) {
+    public static void doSpell(ActiveSpell spell, BlockPos pos, World world, PlayerEntity player) {
+        VRPlayerData data = VRAPI.getVRPlayerData(player);
+
         if (spell == ActiveSpell.LIGHTNING) {
             LightningBoltEntity ent = new LightningBoltEntity(EntityType.LIGHTNING_BOLT, world);
             ent.setPosition(pos.getX(), pos.getY(), pos.getZ());
             world.addEntity(ent);
+        } else if (spell == ActiveSpell.HEAL) {
+            player.heal(4);
+        } else if (spell == ActiveSpell.LEAP) {
+            Vector3d handDirection = data.getActiveController().asLookVec(); // Get direction of hand
+            player.setMotion(handDirection.mul(10, 10, 10)); // Launch in direction of hand
+            player.velocityChanged = true;
         }
     }
 
@@ -291,8 +306,21 @@ public class Wand extends Item {
      * Enum for spell that the player has and to cast.
      */
     public enum ActiveSpell {
-        NONE,
-        LIGHTNING
+        NONE(false),
+        LIGHTNING(true),
+        HEAL(false),
+        LEAP(false);
+
+        private final boolean needsPosition; // Whether or not we need a BlockPos to perform the spell
+
+        private ActiveSpell(boolean needsPosition) {
+            this.needsPosition = needsPosition;
+        }
+
+        public boolean needsPosition() {
+            return this.needsPosition;
+        }
+
     }
 
 }
