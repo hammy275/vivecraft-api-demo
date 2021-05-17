@@ -1,0 +1,3 @@
+# Vivecraft-API-Demo
+
+This demo package serves as both a pitch to you as to why the Vivecraft-API is cool and useful, and simultaneously serves as a basic demonstration on how to use the API to enhance pre-existing items for VR players, or to add new, VR-unique enhancements to the game not already provided by [Vivecraft Forge Extensions](https://github.com/Techjar/VivecraftForgeExtensions_110). Although definitely possible, this repository currently does not demonstrate any way to create VR-unique experiences within the context of Vivecraft.
